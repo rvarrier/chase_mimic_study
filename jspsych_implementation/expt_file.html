@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html>
-  
 <head>
 <title>Animations study</title>
 
-<!-- <script src="consent_nat_new.js"></script>
-<script src="devices_off.js"></script>
-<script src="instructions.js"></script> -->
 <script src="Intro_text.js"></script>
-
 <script src="jspsych/jspsych.js"></script>
     
    
@@ -25,26 +20,6 @@
 
 
 <!DOCTYPE html>
-<html>
-  
-
-
-<!-- <style>
-  /* img  {
-  border: 1px solid black;
-  padding: 15px 15px 15px 15px;
-  background-color: rgb(48, 197, 197); 
-} */
-img {
-  position: left;
-}
-</style> -->
-
-<!--.frame-border { 
-border:3px solid #EEE; 
-}-->
-
-
 <script>
 
 var jsPsych = initJsPsych({
@@ -55,8 +30,6 @@ var jsPsych = initJsPsych({
 
       var date = new Date().toISOString().slice(0, 10)
       jsPsych.data.get().localSave('csv','data' + '.csv'); } //or what ever you want! 
-
-
 //jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
 });
 
@@ -106,18 +79,66 @@ var devices_off = {
     type: jsPsychSurveyHtmlForm,
     preamble: text_list[1].devices_off_1,
     // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
-    html: "<p><input type=checkbox id=consent_checkbox required/> <strong> Understood.</strong> </p>"
-};
+    //html: "<p><input type=checkbox id=consent_checkbox required/> <strong> Understood.</strong> </p>"
+    html: "  ",
+    response_ends_trial:true, 
+    button_label: "Understood. Continue."
+  };
 timeline_temp.push(devices_off)
 
 var devices_off = {
     type: jsPsychSurveyHtmlForm,
     preamble: text_list[1].devices_off_2,
     // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
-    html: "<p><input type=checkbox id=consent_checkbox required/> <strong> All done. Continue.</strong> </p>"
-};
+    //html: "<p><input type=checkbox id=consent_checkbox required/> <strong> All done. Continue.</strong> </p>"
+    html: "  ",
+    response_ends_trial:true, 
+    button_label: "All done. Continue."
+  };
 timeline_temp.push(devices_off)
 
+instr_animation = 'animations/chase__pred_subt0_Black_Posx_350_1.webm'
+repeat_demo = 'True';
+var instr_files = {
+  type: jsPsychVideoKeyboardResponse,
+  stimulus: [instr_animation], // this will be a variable once you have all of them 
+  response_ends_trial:true, 
+  response_allowed_while_playing:true,
+  controls: false,
+  trial_duration: null,//6000, //in ms
+  loop:true,
+  width: 600,
+  border:5,
+  choices: "1",
+  prompt:text_list[2].instructions_txt_1
+  //prompt: text_list[2].instructions_txt_1 + "<p><input type=checkbox id=instr_resp required/> Continue to demo </p>"
+};
+timeline_temp.push(instr_files)
+
+
+var instr_q1 = {
+    type: jsPsychHtmlSliderResponse,
+    stimulus: text_list[2].instructions_txt_2,
+    require_movement:true, //slider will not advance until they move it
+    labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+    rt: 5000,
+    response_ends_trial: false
+
+  }
+timeline_temp.push(instr_q1)
+
+var instr_q2 = {
+    type: jsPsychSurveyMultiChoice,
+    questions: [
+      {
+    //prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
+    options: text_list[2].instructions_txt_3,
+    horizontal:true,
+    rt: 5000,
+    response_ends_trial: false
+      },]
+    } 
+timeline_temp.push(instr_q2)
 
 var animation_playing = {
   type: jsPsychVideoKeyboardResponse,
@@ -128,8 +149,6 @@ var animation_playing = {
   response_ends_trial:false, 
   response_allowed_while_playing:false,
   trial_duration: 6000, //in ms
-  margin_horizontal: '2px',
-  margin_vertical: '2px'
 };
 
 // set the attributes for link element 

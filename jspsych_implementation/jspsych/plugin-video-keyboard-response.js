@@ -113,7 +113,19 @@ var jsPsychVideoKeyboardResponse = (function (jspsych) {
           }
           // setup stimulus
           var video_html = "<div>";
-          video_html += '<video id="jspsych-video-keyboard-response-stimulus"';
+          video_html += '<video';
+          //video_html += '<video style="border:5px solid black" id="jspsych-video-button-response-stimulus"';
+          if (trial.border) {
+            let border_px = trial.border
+            border_px = border_px.toString()
+            video_html += ' style="border:' + border_px + 'px solid black"';
+          }
+
+          video_html += ' id="jspsych-video-keyboard-response-stimulus"';
+
+          if (trial.loop) {
+            video_html += ' loop';
+          }
           if (trial.width) {
               video_html += ' width="' + trial.width + '"';
           }
