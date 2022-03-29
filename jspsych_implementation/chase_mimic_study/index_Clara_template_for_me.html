@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+<title>My experiment</title>
+<!-- <script src="jspsych-7.1.0/jspsych.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-video-keyboard-response.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-html-slider-response.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-survey-multi-choice.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-survey-text.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-image-keyboard-response.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-fullscreen.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-instructions.js" type="text/javascript"></script>
+<script src="jspsych-7.1.0/plugins/jspsych-video-button-response.js" type="text/javascript"></script>
+
+
+<script src="jspsych-6.1.0/plugins/jspsych-call-function.js"></script> -->
+<!-- <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script> -->
+
+
+<script src="consent_nat_new.js"></script>
+
+<!-- <link href="jspsych-6.1.0/css/jspsych_updated.css" rel="stylesheet" type="text/css" /> -->
+
+<script src="jspsych-7.1.0/jspsych/dist/jspsych.js"></script>
+    
+   
+<link rel="stylesheet" href="jspsych-7.1.0/jspsych/dist/jspsych.css" />
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-preload.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-video-keyboard-response.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-html-slider-response.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-survey-text.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-instructions.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-survey-multi-choice.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-html-keyboard-response.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-fullscreen.js"></script>
+ <script src="jspsych-7.1.0/jspsych/dist/plugin-survey-html-form.js"></script>
+
+
+<!DOCTYPE html>
+<html>
+  
+
+
+<!-- <style>
+  /* img  {
+  border: 1px solid black;
+  padding: 15px 15px 15px 15px;
+  background-color: rgb(48, 197, 197); 
+} */
+img {
+  position: left;
+}
+</style> -->
+
+
+
+<script>
+
+var jsPsych = initJsPsych({
+    adapt_to_file_protocol: false,
+    override_safe_mode: true,
+    
+    on_finish: function() { jsPsych.data.displayData(); 
+
+      var date = new Date().toISOString().slice(0, 10)
+      jsPsych.data.get().localSave('csv','data' + '.csv'); } //or what ever you want! 
+
+
+//jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
+});
+
+// You will probably want this from Prolific 
+var participant = jsPsych.data.getURLVariable('participant');
+var participant = Number(participant)
+
+// or you can get it manually 
+var participant = 1
+var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+
+
+// use this function randomize when you get to that
+function random_item(items)
+{return items[Math.floor(Math.random()*items.length)];   }
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;}
+
+
+
+timeline_temp = []
+
+var enter_fullscreen = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: true
+}
+
+var consent_form = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: consent_nat[0].consent_form_naturalistic,
+    // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
+    html: "<p><input type=checkbox id=consent_checkbox required/> <strong> I agree to take part in this study. </strong> </p>"
+};
+
+timeline_temp.push(enter_fullscreen,consent_form)
+
+
+
+
+var animation_playing = {
+  type: jsPsychVideoKeyboardResponse,
+  stimulus: [ // this will be a variable once you have all of them 
+  'animations/chase__pred_subt150_Colorb_Posx850_1.mp4'],
+  //choices: "NO_KEYS",//CHANGE HERE IF YOU WANT THEM TO PRESS THE BUTTON WHEN THEY MAKE THE DECISION
+  response_ends_trial:true, 
+  response_allowed_while_playing:false,
+  trial_duration: 500, //in ms
+};
+
+// NOTE: you will likely want to set ceilings for the timing on this 
+var slider_chase = {
+  type: jsPsychHtmlSliderResponse,
+  stimulus: `<div style="width:600px;"> <p>Did you see a chase, or were the circles moving randomly? Indicate your choice on the continuous bar below.</p>`,
+  require_movement:true, //slider will not advance until they move it
+  labels: ['Random', 'Chase'] // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+}
+
+var circle_choice = {
+  type: jsPsychSurveyMultiChoice,
+  questions: [
+    {
+  prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
+  options: [`<img src="circle_img/blackcircle.png" width="50" height="50"`, `<img src="circle_img/graycircle.jpeg" width="50" height="50"`],
+  horizontal:true,
+    },]
+
+}
+
+
+// can implement a break every couple of trials once you add a loop
+
+
+timeline_temp.push( animation_playing, slider_chase, circle_choice)
+//timeline_temp.push(animation_playing)
+
+
+//Demographic Questions
+var demographic_trial = {
+  type: jsPsychSurveyMultiChoice,
+  questions: [
+    {
+      prompt: "<strong> How would you describe your gender? </strong>", 
+      name: 'gender', 
+      options: ['male', 'female', 'non-binary', 'other', 'do not wish to report'], 
+      required: true,
+      horizontal: true
+    }, 
+    {
+      prompt: "<strong> Are you of hispanic or latinx origin? </strong>", 
+      name: 'hispanic', 
+      options: ['Yes', 'No'], 
+      required: false,
+      horizontal: true
+    }, 
+    {
+      prompt: "<strong> How would you describe your race? </strong>", 
+      name: 'race', 
+      options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'], 
+      required: true,
+      horizontal: true
+    }
+  ],
+
+};
+timeline_temp.push(demographic_trial)
+jsPsych.run(timeline_temp)
+// var goodbye = {
+//     type: "image-keyboard-response_Original", //jsPsychHtmlKeyboardResponse,
+//     stimulus: "Thank you for your participation! <strong> Press any key to submit your data (you are not done until you do and will not get paid) </strong>. This will then take you back to the Prolific page" ,
+//     on_finish: function(){
+//       saveData("_data",jsPsych.data.get().csv());
+//   save_data_csv();
+//     }
+//     };
+//     timeline_temp.push(goodbye);
+
+
+
+//jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
+// });
+
+// jsPsych.init({
+// show_progress_bar: true, //added a progress bar! 
+// timeline: timeline_temp,
+// override_safe_mode: true,
+// //timeline_variables: timeline_vars, //comment this in when you start looping through trials
+// on_finish: function(){
+
+//   //jsPsych.data.displayData();
+//   saveData("_data",jsPsych.data.get().csv());
+//   save_data_csv();
+//   //window.location.replace('https://app.prolific.co/submissions/complete?cc=27267BF2');}
+
+//   window.location.replace('https://rcweb.dartmouth.edu/homes/f004p59/madlibs_full_task_3random/closing.html')}
+// });
+
+//THIS LAST PART IS FOR SAVING THE DATA! IT NEEDS TO BE FIXED FOR YOUR OWN EXPERIMENT AND PATHWAYS
+
+// function saveData(name, data){
+//   var xhr = new XMLHttpRequest();
+//   xhr.open('POST', 'write_data.php'); // 'write_data.php' is the path to the php file described above.
+//   xhr.setRequestHeader('Content-Type', 'application/json');
+//   xhr.send(JSON.stringify({filedata: data}));
+// }
+
+// // call the saveData function after the experiment is over
+// var date = new Date().toISOString().slice(0, 10)
+// const d = new Date();
+// let time = d.getTime();
+// jsPsych.data.addProperties({
+//         time_done: time})
+// var save_url = "https://rcweb.dartmouth.edu/homes/f004p59/madlibs_full_task_3random/write_data.php";
+// function save_data_csv() {
+//         jQuery.ajax({
+//             type: 'post',
+//             cache: false,
+//             url: save_url,
+//             data: {
+//                 data_dir: "data",
+//                 file_name: 'madlibs_3random_participant' + participant + '_' +date+ '_' + time+'.csv', // the file type should be added
+//                 exp_data: jsPsych.data.get().csv()
+//             }
+//         });
+//     }
+// function save_temp_data_csv() {
+//     //const d = new Date();
+//     let time = d.getTime();
+//         jQuery.ajax({
+//             type: 'post',
+//             cache: false,
+//             url: save_url,
+//             data: {
+//                 data_dir: "data",
+//                 file_name: 'madlibs_3random_participant' + participant + '_' +'temp'+ '_' + time +'.csv', // the file type should be added
+//                 exp_data: jsPsych.data.get().csv()
+//             }
+//         });
+//     }
+
+</script>
+</body>
+</html>
+        
