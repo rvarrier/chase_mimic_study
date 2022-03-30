@@ -14,6 +14,7 @@
  <script src="jspsych/plugin-survey-text.js"></script>
  <script src="jspsych/plugin-instructions.js"></script>
  <script src="jspsych/plugin-survey-multi-choice.js"></script>
+ <script src="jspsych/plugin-survey-multi-select.js"></script>
  <script src="jspsych/plugin-html-keyboard-response.js"></script>
  <script src="jspsych/plugin-fullscreen.js"></script>
  <script src="jspsych/plugin-survey-html-form.js"></script>
@@ -55,9 +56,7 @@ function shuffle(a) {
         a[i] = a[j];
         a[j] = x;
     }
-    return a;}
-
-
+    return a;}  
 
 timeline_temp = []
 
@@ -66,20 +65,19 @@ var enter_fullscreen = {
   fullscreen_mode: false
 }
 
+//consent form
 var consent_form = {
     type: jsPsychSurveyHtmlForm,
     preamble: text_list[0].consent_form_naturalistic,
     // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
     html: "<p><input type=checkbox id=consent_checkbox required/> <strong> I agree to take part in this study. </strong> </p>"
 };
-
 timeline_temp.push(enter_fullscreen,consent_form)
 
+// devices_off
 var devices_off = {
     type: jsPsychSurveyHtmlForm,
     preamble: text_list[1].devices_off_1,
-    // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
-    //html: "<p><input type=checkbox id=consent_checkbox required/> <strong> Understood.</strong> </p>"
     html: "  ",
     response_ends_trial:true, 
     button_label: "Understood. Continue."
@@ -89,16 +87,14 @@ timeline_temp.push(devices_off)
 var devices_off = {
     type: jsPsychSurveyHtmlForm,
     preamble: text_list[1].devices_off_2,
-    // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
-    //html: "<p><input type=checkbox id=consent_checkbox required/> <strong> All done. Continue.</strong> </p>"
     html: "  ",
     response_ends_trial:true, 
     button_label: "All done. Continue."
   };
 timeline_temp.push(devices_off)
 
+//instructions - REDUCE TEXT!
 instr_animation = 'animations/chase__pred_subt0_Black_Posx_350_1.webm'
-repeat_demo = 'True';
 var instr_files = {
   type: jsPsychVideoKeyboardResponse,
   stimulus: [instr_animation], // this will be a variable once you have all of them 
@@ -110,11 +106,10 @@ var instr_files = {
   width: 600,
   border:5,
   choices: "1",
-  prompt:text_list[2].instructions_txt_1
+  prompt:text_list[2].instructions_txt_1 + '<p><input type=checkbox id=instr_checkbox required/> <strong>Understood.</strong> </p>'
   //prompt: text_list[2].instructions_txt_1 + "<p><input type=checkbox id=instr_resp required/> Continue to demo </p>"
 };
 timeline_temp.push(instr_files)
-
 
 var instr_q1 = {
     type: jsPsychHtmlSliderResponse,
@@ -122,8 +117,7 @@ var instr_q1 = {
     require_movement:true, //slider will not advance until they move it
     labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
     rt: 5000,
-    response_ends_trial: false
-
+    response_ends_trial: true
   }
 timeline_temp.push(instr_q1)
 
@@ -132,7 +126,8 @@ var instr_q2 = {
     questions: [
       {
     //prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
-    options: text_list[2].instructions_txt_3,
+    prompt: text_list[2].instructions_txt_3,
+    options: [`<img src="circle_img/black_circle.png" width="25" height="25"`, `<img src="circle_img/grey_circle.png" width="25" height="25"`],
     horizontal:true,
     rt: 5000,
     response_ends_trial: false
@@ -140,79 +135,155 @@ var instr_q2 = {
     } 
 timeline_temp.push(instr_q2)
 
-var animation_playing = {
-  type: jsPsychVideoKeyboardResponse,
-  stimulus: [ // this will be a variable once you have all of them 
-  //'animations/chase__pred_subt150_Colorb_Posx850_1.mp4'],
-  'animations/chase__pred_subt0_Black_Posx_350_1.webm'],
-  //choices: "NO_KEYS",//CHANGE HERE IF YOU WANT THEM TO PRESS THE BUTTON WHEN THEY MAKE THE DECISION
-  response_ends_trial:false, 
-  response_allowed_while_playing:false,
-  trial_duration: 6000, //in ms
-};
-
-// set the attributes for link element 
-//animation_playing.rel = 'stylesheet'; 
-//animation_playing.type = 'text/css';
-//animation_playing.href = 'style.css'; 
-
-// NOTE: you will likely want to set ceilings for the timing on this 
-var slider_chase = {
-  type: jsPsychHtmlSliderResponse,
-  stimulus: `<div style="width:600px;"> <p>Did you see a chase, or were the circles moving randomly? Indicate your choice on the continuous bar below.</p>`,
-  require_movement:true, //slider will not advance until they move it
-  labels: ['Random', 'Chase'] // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+//Demo begins
+function generateRandomInteger(max) {
+    return Math.floor(Math.random() * max);
 }
+demo_animations_files = ['animations/chase__pred_subt0_Black_Posx_350_1.webm',
+'animations/chase__pred_subt0_Black_Posx_350_2.webm']
+
+var intro_page = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: "Demo begins. Please keep your eyes on the screen, and try to respond quickly, but as precisely as possible.",
+    html: "  ",
+    response_ends_trial:true, 
+    button_label: "Continue."
+  };
+timeline_temp.push(intro_page)
+
+//elements for each trial
+var animation_playing = {
+    type: jsPsychVideoKeyboardResponse,
+    stimulus: [], // webm filename
+    response_ends_trial:false, 
+    width: 600,
+    border:5,
+    response_allowed_while_playing:false,
+    trial_duration: 6000 //in ms
+  };
+
+var slider_chase = {
+    type: jsPsychHtmlSliderResponse,
+    stimulus: '<div style="width:800px;"><p><strong>Question 1: Was there a chase, or were the circles moving randomly?<br>Indicate your choice on the continuous bar below.</p></div>',
+    require_movement:true, //slider will not advance until they move it
+    labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+    rt: 5000, // NOTE: you will likely want to set ceilings for the timing on this 
+    response_ends_trial: true
+  } // best to not randomixe chase/random, but can randomie initial cursor position if needed  (although we'd have to include it as a regressor later)
 
 var circle_choice = {
-  type: jsPsychSurveyMultiChoice,
-  questions: [
-    {
-  prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
-  options: [`<img src="circle_img/blackcircle.png" width="50" height="50"`, `<img src="circle_img/graycircle.jpeg" width="50" height="50"`],
-  horizontal:true,
-    },]
+    type: jsPsychSurveyMultiChoice,
+    questions: [{
+    prompt: "<strong>Question 2: Which circle could have been the chaser?<br>Make a guess if you didn't see a chase at all.</strong>",
+    options: [`<img src="circle_img/black_circle.png" width="25" height="25"`, `<img src="circle_img/grey_circle.png" width="25" height="25"`],
+    horizontal:true,
+      }] // optional: swap black/grey order
+  }
 
+repeat_demo = 'True';
+while (repeat_demo == 'True') {
+  for (i = 0; i <2; i++) {
+    demo_ind = generateRandomInteger(demo_animations_files.length) // 0 or 1 for now
+    animation_playing.stimulus = [demo_animations_files[demo_ind]]
+    timeline_temp.push( animation_playing, slider_chase, circle_choice)
+  }
+  repeat_demo = 'False';
+  //if (i==1): // optioanl: ask subjects if theyr want to do the demo again
 }
 
+// Main expt section
+var intro_page = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: "<p>Main experiment begins.<br>Please keep your eyes on the screen until the next break</p>",
+    html: "  ",
+    response_ends_trial:true, 
+    button_label: "Continue."
+  };
+  //intro_page.preamble = "Main experiment begins.."
+timeline_temp.push(intro_page)
 
-// can implement a break every couple of trials once you add a loop
+for (i = 0; i <9; i++) {
+  animation_playing.stimulus = ['animations/chase__pred_subt0_Black_Posx_350_1.webm'],
+  timeline_temp.push( animation_playing, slider_chase, circle_choice)
 
+  if (i%7 ==0) {
+  var break_screen = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: "Break. Press continue when ready to proceed.",
+    response_ends_trial:true, 
+    html: ' ',
+    button_label: "Continue"
+  };
+timeline_temp.push(break_screen);
+}
+  // can implement a break every couple of trials once you add a loop
 
-timeline_temp.push( animation_playing, slider_chase, circle_choice)
+}
 //timeline_temp.push(animation_playing)
 
+var post_hoc_qns = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: '<strong>Did you use any strategies while performing this task? </strong>',
+  html: '<input name="strategies" type="text" />'
+};
+timeline_temp.push(post_hoc_qns);
+
+var post_hoc_qns = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: '<strong>Any other feedback? </strong>',
+  html: '<input name="feedback" type="text" />'
+};
+timeline_temp.push(post_hoc_qns);
 
 //Demographic Questions
-var demographic_trial = {
+var demographic_mcq = {
   type: jsPsychSurveyMultiChoice,
   questions: [
     {
       prompt: "<strong> How would you describe your gender? </strong>", 
       name: 'gender', 
-      options: ['male', 'female', 'non-binary', 'other', 'do not wish to report'], 
-      required: true,
+      options: ['Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say'], 
+      required: false,
       horizontal: true
     }, 
     {
       prompt: "<strong> Are you of hispanic or latinx origin? </strong>", 
       name: 'hispanic', 
-      options: ['Yes', 'No'], 
+      options: ['Yes', 'No', 'Neither', 'Prefer not to say'], 
       required: false,
-      horizontal: true
-    }, 
-    {
-      prompt: "<strong> How would you describe your race? </strong>", 
-      name: 'race', 
-      options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'], 
-      required: true,
       horizontal: true
     }
   ],
-
 };
-timeline_temp.push(demographic_trial)
+
+var race = { 
+    type: jsPsychSurveyMultiSelect,
+    questions: [ {
+      prompt: "<strong> How would you describe your race? </strong>", 
+      name: 'race', 
+      options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'], 
+      required: false,
+      horizontal: true
+    }]}
+
+timeline_temp.push(demographic_mcq)
 jsPsych.run(timeline_temp)
+
+
+var post_hoc_qns = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: '<strong>Age</strong>',
+  html: '<input name="age" type="numeric" />'
+};
+timeline_temp.push(post_hoc_qns);
+
+var post_hoc_qns = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: '<strong>Location: </strong>',
+  html: '<input name="location" type="text" />'
+};
+timeline_temp.push(post_hoc_qns);
+
 // var goodbye = {
 //     type: "image-keyboard-response_Original", //jsPsychHtmlKeyboardResponse,
 //     stimulus: "Thank you for your participation! <strong> Press any key to submit your data (you are not done until you do and will not get paid) </strong>. This will then take you back to the Prolific page" ,
