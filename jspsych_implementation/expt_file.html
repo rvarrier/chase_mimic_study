@@ -1,288 +1,278 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Animations study</title>
+  <title>Animations study</title>
 
-<script src="Intro_text.js"></script>
-<script src="jspsych/jspsych.js"></script>
-    
-   
-<link rel="stylesheet" href="jspsych/jspsych.css" />
- <script src="jspsych/plugin-preload.js"></script>
- <script src="jspsych/plugin-video-keyboard-response.js"></script>
- <script src="jspsych/plugin-html-slider-response.js"></script>
- <script src="jspsych/plugin-survey-text.js"></script>
- <script src="jspsych/plugin-instructions.js"></script>
- <script src="jspsych/plugin-survey-multi-choice.js"></script>
- <script src="jspsych/plugin-survey-multi-select.js"></script>
- <script src="jspsych/plugin-html-keyboard-response.js"></script>
- <script src="jspsych/plugin-fullscreen.js"></script>
- <script src="jspsych/plugin-survey-html-form.js"></script>
+  <script src="expt_material/Intro_text.js"></script>
+  <script src="jspsych/jspsych.js"></script>
+  <script type="text/javascript" src="pseudo_randomize.js"></script>
+  <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+  <script src = "expt_material/randomization/vidNames.js"></script>
+  <script src = "expt_material/randomization/stimInfo.js"></script>
 
-
-<!DOCTYPE html>
-<script>
-
-var jsPsych = initJsPsych({
-    adapt_to_file_protocol: false,
-    override_safe_mode: true,
-    
-    on_finish: function() { jsPsych.data.displayData(); 
-
-      var date = new Date().toISOString().slice(0, 10)
-      jsPsych.data.get().localSave('csv','data' + '.csv'); } //or what ever you want! 
-//jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
-});
-
-// You will probably want this from Prolific 
-var participant = jsPsych.data.getURLVariable('participant');
-var participant = Number(participant)
-
-// or you can get it manually 
-var participant = 1
-var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
-var study_id = jsPsych.data.getURLVariable('STUDY_ID');
-var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+  <link rel="stylesheet" href="jspsych/jspsych.css" />
+  <script src="jspsych/plugin-preload.js"></script>
+  <script src="jspsych/plugin-video-keyboard-response.js"></script>
+  <script src="jspsych/plugin-html-slider-response.js"></script>
+  <script src="jspsych/plugin-survey-text.js"></script>
+  <script src="jspsych/plugin-instructions.js"></script>
+  <script src="jspsych/plugin-survey-multi-choice.js"></script>
+  <script src="jspsych/plugin-survey-multi-select.js"></script>
+  <script src="jspsych/plugin-html-keyboard-response.js"></script>
+  <script src="jspsych/plugin-fullscreen.js"></script>
+  <script src="jspsych/plugin-survey-html-form.js"></script>
 
 
-// use this function randomize when you get to that
-function random_item(items)
-{return items[Math.floor(Math.random()*items.length)];   }
-function shuffle(a) {
-    var j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
+  <!DOCTYPE html>
+  <script>
+
+    var jsPsych = initJsPsych({
+      adapt_to_file_protocol: false,
+      override_safe_mode: true,
+
+      on_finish: function () {
+        jsPsych.data.displayData();
+
+        var date = new Date().toISOString().slice(0, 10)
+        jsPsych.data.get().localSave('csv', 'data' + '.csv');
+      } //or what ever you want! 
+      //jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
+    });
+
+    // You will probably want this from Prolific 
+    var participant = jsPsych.data.getURLVariable('participant');
+    var participant = Number(participant)
+
+    // or you can get it manually 
+    var participant = 1
+    var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+    var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+    var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+
+    // PSEUDO-RANDOMIZATION
+    timeline_temp = []
+
+    var enter_fullscreen = {
+      type: jsPsychFullscreen,
+      fullscreen_mode: false
     }
-    return a;}  
 
-timeline_temp = []
+    //consent form
+    var consent_form = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: text_list[0].consent_form_naturalistic,
+      // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
+      html: "<p><input type=checkbox id=consent_checkbox required/> <strong> I agree to take part in this study. </strong> </p>"
+    };
+    timeline_temp.push(enter_fullscreen, consent_form)
 
-var enter_fullscreen = {
-  type: jsPsychFullscreen,
-  fullscreen_mode: false
-}
+    // devices_off
+    var devices_off = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: text_list[1].devices_off_1,
+      html: "  ",
+      response_ends_trial: true,
+      button_label: "Understood. Continue."
+    };
+    timeline_temp.push(devices_off)
 
-//consent form
-var consent_form = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: text_list[0].consent_form_naturalistic,
-    // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
-    html: "<p><input type=checkbox id=consent_checkbox required/> <strong> I agree to take part in this study. </strong> </p>"
-};
-timeline_temp.push(enter_fullscreen,consent_form)
+    var devices_off = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: text_list[1].devices_off_2,
+      html: "  ",
+      response_ends_trial: true,
+      button_label: "All done. Continue."
+    };
+    timeline_temp.push(devices_off)
 
-// devices_off
-var devices_off = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: text_list[1].devices_off_1,
-    html: "  ",
-    response_ends_trial:true, 
-    button_label: "Understood. Continue."
-  };
-timeline_temp.push(devices_off)
+    //instructions - REDUCE TEXT?
+    var instr_files = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: text_list[2].instructions_txt_a,
+      // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
+      html: text_list[2].instructions_txt_b
+    };
+    timeline_temp.push(enter_fullscreen, instr_files)
 
-var devices_off = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: text_list[1].devices_off_2,
-    html: "  ",
-    response_ends_trial:true, 
-    button_label: "All done. Continue."
-  };
-timeline_temp.push(devices_off)
+    var instr_q1 = {
+      type: jsPsychHtmlSliderResponse,
+      stimulus: text_list[3].instructions_q1,
+      require_movement: true, //slider will not advance until they move it
+      labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+      //rt: 5000,
+      //response_ends_trial: true
+    }
+    timeline_temp.push(instr_q1)
 
-//instructions - REDUCE TEXT!
-instr_animation = 'animations/chase__pred_subt0_Black_Posx_350_1.webm'
-var instr_files = {
-  type: jsPsychVideoKeyboardResponse,
-  stimulus: [instr_animation], // this will be a variable once you have all of them 
-  response_ends_trial:true, 
-  response_allowed_while_playing:true,
-  controls: false,
-  trial_duration: null,//6000, //in ms
-  loop:true,
-  width: 600,
-  border:5,
-  choices: "1",
-  prompt:text_list[2].instructions_txt_1 + '<p><input type=checkbox id=instr_checkbox required/> <strong>Understood.</strong> </p>'
-  //prompt: text_list[2].instructions_txt_1 + "<p><input type=checkbox id=instr_resp required/> Continue to demo </p>"
-};
-timeline_temp.push(instr_files)
+    var instr_q2 = {
+      type: jsPsychSurveyMultiChoice,
+      questions: [
+        {
+          //prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
+          prompt: text_list[4].instructions_q2,
+          options: [`<img src="expt_material/circle_img/black_circle.png" width="25" height="25"`, `<img src="expt_material/circle_img/grey_circle.png" width="25" height="25"`],
+          horizontal: true,
+          rt: 5000,
+          response_ends_trial: true
+        },]
+    }
+    timeline_temp.push(instr_q2)
 
-var instr_q1 = {
-    type: jsPsychHtmlSliderResponse,
-    stimulus: text_list[2].instructions_txt_2,
-    require_movement:true, //slider will not advance until they move it
-    labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
-    rt: 5000,
-    response_ends_trial: true
-  }
-timeline_temp.push(instr_q1)
+    //Demo begins
+    var intro_page = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: "Demo begins. Please keep your eyes on the screen, and try to respond quickly, but as precisely as possible.",
+      html: "  ",
+      response_ends_trial: true,
+      button_label: "Continue."
+    };
+    timeline_temp.push(intro_page)
 
-var instr_q2 = {
-    type: jsPsychSurveyMultiChoice,
-    questions: [
-      {
-    //prompt: "Which circle did you think was the chaser? Make a guess if you didn't see a chase at all.",
-    prompt: text_list[2].instructions_txt_3,
-    options: [`<img src="circle_img/black_circle.png" width="25" height="25"`, `<img src="circle_img/grey_circle.png" width="25" height="25"`],
-    horizontal:true,
-    rt: 5000,
-    response_ends_trial: false
-      },]
-    } 
-timeline_temp.push(instr_q2)
+    function generateRandomInteger(max) {
+      return Math.floor(Math.random() * max);
+    }
+    demo_animations_files = ['demo_animations/chase__pred_subt0_Black_Posx_350_1.webm',
+      'animations/chase__pred_subt0_Black_Posx_350_2.webm']
 
-//Demo begins
-function generateRandomInteger(max) {
-    return Math.floor(Math.random() * max);
-}
-demo_animations_files = ['animations/chase__pred_subt0_Black_Posx_350_1.webm',
-'animations/chase__pred_subt0_Black_Posx_350_2.webm']
+    //elements for each trial
+    var animation_playing = {
+      preamble:''
+      type: jsPsychVideoKeyboardResponse,
+      stimulus: [], // webm filename
+      response_ends_trial: false,
+      width: 600,
+      border: 5,
+      response_allowed_while_playing: false,
+      trial_duration: 6200 //in ms
+    };
 
-var intro_page = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: "Demo begins. Please keep your eyes on the screen, and try to respond quickly, but as precisely as possible.",
-    html: "  ",
-    response_ends_trial:true, 
-    button_label: "Continue."
-  };
-timeline_temp.push(intro_page)
+    var slider_chase = {
+      type: jsPsychHtmlSliderResponse,
+      stimulus: '<p>Please try to respond quickly, but as accurately as possible.</p><div style="width:800px;"><p><strong>Question 1: Was there a chase, or were the circles moving randomly?<br>Indicate your choice on the continuous bar below.</p></div>',
+      require_movement: true, //slider will not advance until they move it
+      labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
+      rt: 5000, // NOTE: you will likely want to set ceilings for the timing on this 
+      response_ends_trial: true
+    } // best to not randomixe chase/random, but can randomie initial cursor position if needed  (although we'd have to include it as a regressor later)
 
-//elements for each trial
-var animation_playing = {
-    type: jsPsychVideoKeyboardResponse,
-    stimulus: [], // webm filename
-    response_ends_trial:false, 
-    width: 600,
-    border:5,
-    response_allowed_while_playing:false,
-    trial_duration: 6000 //in ms
-  };
-
-var slider_chase = {
-    type: jsPsychHtmlSliderResponse,
-    stimulus: '<div style="width:800px;"><p><strong>Question 1: Was there a chase, or were the circles moving randomly?<br>Indicate your choice on the continuous bar below.</p></div>',
-    require_movement:true, //slider will not advance until they move it
-    labels: ['Random', 'Chase'], // if you want to randomly change which is on which side let me know and I can show you how to implement that (you need to use JS and then generate 2 variables that are called in here)
-    rt: 5000, // NOTE: you will likely want to set ceilings for the timing on this 
-    response_ends_trial: true
-  } // best to not randomixe chase/random, but can randomie initial cursor position if needed  (although we'd have to include it as a regressor later)
-
-var circle_choice = {
-    type: jsPsychSurveyMultiChoice,
-    questions: [{
-    prompt: "<strong>Question 2: Which circle could have been the chaser?<br>Make a guess if you didn't see a chase at all.</strong>",
-    options: [`<img src="circle_img/black_circle.png" width="25" height="25"`, `<img src="circle_img/grey_circle.png" width="25" height="25"`],
-    horizontal:true,
+    var circle_choice = {
+      type: jsPsychSurveyMultiChoice,
+      questions: [{
+        prompt: "<strong>Question 2: Which circle could have been the chaser?<br>Make a guess if you didn't see a chase at all.</strong>",
+        options: [`<img src="expt_material/circle_img/black_circle.png" width="25" height="25"`, `<img src="expt_material/circle_img/grey_circle.png" width="25" height="25"`],
+        horizontal: true,
+        required: true
       }] // optional: swap black/grey order
-  }
-
-repeat_demo = 'True';
-while (repeat_demo == 'True') {
-  for (i = 0; i <2; i++) {
-    demo_ind = generateRandomInteger(demo_animations_files.length) // 0 or 1 for now
-    animation_playing.stimulus = [demo_animations_files[demo_ind]]
-    timeline_temp.push( animation_playing, slider_chase, circle_choice)
-  }
-  repeat_demo = 'False';
-  //if (i==1): // optioanl: ask subjects if theyr want to do the demo again
-}
-
-// Main expt section
-var intro_page = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: "<p>Main experiment begins.<br>Please keep your eyes on the screen until the next break</p>",
-    html: "  ",
-    response_ends_trial:true, 
-    button_label: "Continue."
-  };
-  //intro_page.preamble = "Main experiment begins.."
-timeline_temp.push(intro_page)
-
-for (i = 0; i <9; i++) {
-  animation_playing.stimulus = ['animations/chase__pred_subt0_Black_Posx_350_1.webm'],
-  timeline_temp.push( animation_playing, slider_chase, circle_choice)
-
-  if (i%7 ==0) {
-  var break_screen = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: "Break. Press continue when ready to proceed.",
-    response_ends_trial:true, 
-    html: ' ',
-    button_label: "Continue"
-  };
-timeline_temp.push(break_screen);
-}
-  // can implement a break every couple of trials once you add a loop
-
-}
-//timeline_temp.push(animation_playing)
-
-var post_hoc_qns = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: '<strong>Did you use any strategies while performing this task? </strong>',
-  html: '<input name="strategies" type="text" />'
-};
-timeline_temp.push(post_hoc_qns);
-
-var post_hoc_qns = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: '<strong>Any other feedback? </strong>',
-  html: '<input name="feedback" type="text" />'
-};
-timeline_temp.push(post_hoc_qns);
-
-//Demographic Questions
-var demographic_mcq = {
-  type: jsPsychSurveyMultiChoice,
-  questions: [
-    {
-      prompt: "<strong> How would you describe your gender? </strong>", 
-      name: 'gender', 
-      options: ['Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say'], 
-      required: false,
-      horizontal: true
-    }, 
-    {
-      prompt: "<strong> Are you of hispanic or latinx origin? </strong>", 
-      name: 'hispanic', 
-      options: ['Yes', 'No', 'Neither', 'Prefer not to say'], 
-      required: false,
-      horizontal: true
     }
-  ],
-};
 
-var race = { 
-    type: jsPsychSurveyMultiSelect,
-    questions: [ {
-      prompt: "<strong> How would you describe your race? </strong>", 
-      name: 'race', 
-      options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'], 
-      required: false,
-      horizontal: true
-    }]}
+    repeat_demo = 'True';
+    while (repeat_demo == 'True') {
+      for (i = 0; i < 2; i++) {
+        demo_ind = generateRandomInteger(demo_animations_files.length) // 0 or 1 for now
+        animation_playing.stimulus = [demo_animations_files[demo_ind]]
+        timeline_temp.push(animation_playing, slider_chase, circle_choice)
+      }
+      repeat_demo = 'False';
+      //if (i==1): // optioanl: ask subjects if theyr want to do the demo again
+    }
 
-timeline_temp.push(demographic_mcq)
-jsPsych.run(timeline_temp)
+    // Main expt section
+    var intro_page = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: "<p>Main experiment begins.<br>Please keep your eyes on the screen until the next break</p>",
+      html: "  ",
+      response_ends_trial: true,
+      button_label: "Continue."
+    };
+    //intro_page.preamble = "Main experiment begins.."
+    timeline_temp.push(intro_page)
+    
+    var stim_list = pseudo_randomize_fn();
+    
+    console.log(stim_list)
+    for (i = 0; i < 10; i++) {
+      file_ind = stim_list[i]
+      animation_playing.stimulus = ['main_animations/final_chase/' + mainVid_names.fileName[file_ind]],
+        timeline_temp.push(animation_playing, slider_chase, circle_choice)
+      
+      if ((i>0) && (i % 7 == 0)) {
+        var break_screen = {
+          type: jsPsychSurveyHtmlForm,
+          preamble: "Break. Press continue when ready to proceed.",
+          response_ends_trial: true,
+          html: ' ',
+          button_label: "Continue"
+        };
+        timeline_temp.push(break_screen);
+      }
+
+    }
+    //timeline_temp.push(animation_playing)
+
+    var post_hoc_qns = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: '<strong>Did you use any strategies while performing this task? </strong>',
+      html: '<input name="strategies" type="text" />'
+    };
+    timeline_temp.push(post_hoc_qns);
+
+    var post_hoc_qns = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: '<strong>Any other feedback? </strong>',
+      html: '<input name="feedback" type="text" />'
+    };
+    timeline_temp.push(post_hoc_qns);
+
+    //Demographic Questions
+    var demographic_mcq = {
+      type: jsPsychSurveyMultiChoice,
+      questions: [
+        {
+          prompt: "<strong> How would you describe your gender? </strong>",
+          name: 'gender',
+          options: ['Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say'],
+          required: false,
+          horizontal: true
+        },
+        {
+          prompt: "<strong> Are you of hispanic or latinx origin? </strong>",
+          name: 'hispanic',
+          options: ['Yes', 'No', 'Neither', 'Prefer not to say'],
+          required: false,
+          horizontal: true
+        }
+      ],
+    };
+
+    var race = {
+      type: jsPsychSurveyMultiSelect,
+      questions: [{
+        prompt: "<strong> How would you describe your race? </strong>",
+        name: 'race',
+        options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'],
+        required: false,
+        horizontal: true
+      }]
+    }
+
+    timeline_temp.push(demographic_mcq)
+    jsPsych.run(timeline_temp)
 
 
-var post_hoc_qns = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: '<strong>Age</strong>',
-  html: '<input name="age" type="numeric" />'
-};
-timeline_temp.push(post_hoc_qns);
+    var post_hoc_qns = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: '<strong>Age</strong>',
+      html: '<input name="age" type="numeric" />'
+    };
+    timeline_temp.push(post_hoc_qns);
 
-var post_hoc_qns = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: '<strong>Location: </strong>',
-  html: '<input name="location" type="text" />'
-};
-timeline_temp.push(post_hoc_qns);
+    var post_hoc_qns = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: '<strong>Location: </strong>',
+      html: '<input name="location" type="text" />'
+    };
+    timeline_temp.push(post_hoc_qns);
 
 // var goodbye = {
 //     type: "image-keyboard-response_Original", //jsPsychHtmlKeyboardResponse,
@@ -357,6 +347,7 @@ timeline_temp.push(post_hoc_qns);
 //         });
 //     }
 
-</script>
-</body>
+  </script>
+  </body>
+
 </html>
