@@ -1,0 +1,24 @@
+<script src="jspsych/jspsych.js"></script>
+<script src="jspsych/plugin-fullscreen.js"></script>
+    
+<script src="jspsych/plugin-survey-html-form copy_2qns.js"></script>
+<script>
+    timeline_temp = []
+    var enter_fullscreen = {
+        type: jsPsychFullscreen,
+        fullscreen_mode: false
+    }
+    var jsPsych = initJsPsych({
+        adapt_to_file_protocol: false,
+        override_safe_mode: true,
+    });
+    var responses = {
+        type: jsPsychSurveyHtmlForm2,
+        preamble: '<p>Try to respond quickly, but accurately.</p><div style="width:800px;"><p><strong>Was there a chase, or were the circles moving randomly?</strong><br>Indicate your choice on the continuous bar below.</p></div>',
+        // html: consent_nat[0].consent_form_naturalistic + "<p><input type=checkbox id=consent_checkbox required/>I agree to take part in this study. </p>"
+        html: '<p>TEST</p>',
+    };
+    timeline_temp.push(enter_fullscreen, responses)
+
+    jsPsych.run(timeline_temp)
+</script>

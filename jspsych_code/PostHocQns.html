@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<title>Post Hoc Qns</title>
+
+<script src="jspsych/jspsych.js"></script>
+<script src="expt_material/randomization/vidNames.js"></script>
+<script src="expt_material/randomization/stimInfo.js"></script>
+
+<link rel="stylesheet" href="jspsych/jspsych.css" />
+<script src="jspsych/plugin-preload.js"></script>
+<script src="jspsych/plugin-video-keyboard-response.js"></script>
+<script src="jspsych/plugin-html-slider-response.js"></script>
+
+<script src="jspsych/plugin-survey-multi-choice.js"></script>
+<script src="jspsych/plugin-survey-multi-select.js"></script>
+<script src="jspsych/plugin-html-keyboard-response.js"></script>
+<script src="jspsych/plugin-fullscreen.js"></script>
+<script src="jspsych/plugin-survey-html-form.js"></script>
+
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
+
+
+<script>
+  var jsPsych = initJsPsych({
+    adapt_to_file_protocol: false,
+    override_safe_mode: true,
+
+    on_finish: function () {
+      jsPsych.data.displayData();
+
+      var date = new Date().toISOString().slice(0, 10)
+      jsPsych.data.get().localSave('csv', 'data' + '.csv');
+      //jsPsych.data.get().localSave('csv','data/eventsegbehav_participant' + jsPsych.timelineVariable(participant,"true") +'.csv'); }
+    }
+  });
+
+  timeline_temp = []
+
+  input_qns = '<p align="left">Did you use any strategies while performing this task?<br> <input id = "strategy" class="textbox" type="text" size="50%" height="50" name="strat" required /> <br><br>Any other feedback?<br> <input id = "fb" class ="textbox" type="text" size="50%" height="50" name="feedback" required/></p><br><br><br>'
+
+  var post_hoc_qns = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: '<p align="left"> <strong>Thank you for the tasks. Now some last questions!</strong><br>Press Enter/Return only when are done typing.</p>',
+    html: input_qns
+  };
+  timeline_temp.push(post_hoc_qns);
+
+  /*var post_hoc_qns_page = {
+    timeline: [post_hoc_qns],
+    on_load: function () {
+      //const radioButtons = document.querySelectorAll('input[name="q2"]:checked')//.value;
+      //console.log('radioButtons', radioButtons)
+      const slid = document.querySelector('#jspsych-html-slider-response-response');
+      //console.log(slid)
+      const q1 = document.querySelector('#strategies');
+      const q1alt = document.getElementById('values');
+      //const btn2 = document.querySelector('#ID_grey');
+
+
+      //var input = document.getElementBy("strategy");
+      q1alt.addEventListener("keyup", () => {
+      //input.addEventListener("keyup", function (event) {
+        // Number 13 is the "Enter" key on the keyboard
+        console.log(event.keyCode)
+        if (event.keyCode === 13) {
+          // Cancel the default action, if needed
+          event.preventDefault();
+        }
+      })
+    }
+  }
+  timeline_temp.push(post_hoc_qns_page);*/
+
+  //Demographic Questions
+  var demographic_mcq = {
+    type: jsPsychSurveyMultiChoice,
+    questions: [
+      {
+        prompt: "<style>p{text-align: left;}</style><p><strong> How would you describe your gender? (optional)<br></strong></p>",
+        name: 'gender',
+        options: ['Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say'],
+        required: false,
+        horizontal: true
+      },
+      {
+        prompt: "<style>p{text-align: left;}</style><p><strong> Are you of hispanic or latinx origin?<br></strong></p>",
+        name: 'hispanic',
+        options: ['Yes', 'No', 'Neither', 'Prefer not to say'],
+        required: false,
+        horizontal: true
+      }
+    ],
+  };
+  timeline_temp.push(demographic_mcq)
+
+  var race = {
+    type: jsPsychSurveyMultiSelect,
+    questions: [{
+      prompt: "<style>p{text-align: left;}</style><p><strong>How would you describe your race? (optional)<br></strong></p>",
+      name: 'race',
+      options: ['American Indian/Alaska Native', 'Asian', 'Native Hawaiian or Other Pacific Islander', 'Black or African American', 'White', 'More than one race', 'Do not wish to report'],
+      required: false,
+      horizontal: true
+    }]
+  }
+  timeline_temp.push(race)
+
+  input_qns = '<p align="left">Age:<br> <input id = "age" type="number" size="50%" height="50" name="age" /> <br><br>Location (US state): <br> <input id = "loc" type="text" size="50%" height="50" name="location"/></p><br><br><br>'
+
+  var post_hoc_qns = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: '',
+    html: input_qns
+  };
+  timeline_temp.push(post_hoc_qns);
+
+  jsPsych.run(timeline_temp)
+
+
+</script>
+
+
+</html>

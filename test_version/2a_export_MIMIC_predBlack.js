@@ -10,15 +10,15 @@ var export_path, bad_inds_array, bad_inds_obj;
 
 if (condition == 'redo_bad') {
   //console.log('in redo')
-  bad_inds_array = require('/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/bad_MIMIC_inds.json');
+  bad_inds_array = require('/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/bad_MIMIC_inds_3.json'); //CHANGE HERE AS REQUIRED
   bad_inds_obj = JSON.parse(bad_inds_array); // each coordinate is dataObj.x[i], dataObj.y[i]
-  export_path = "/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/vids/mimic2/mimic_flipped_.webm";
+  export_path = "/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/vids/mimic4/mimic_flipped_.webm"; //CHANGE HERE AS REQUIRED
 }// else {
 //  console.log('not in redo')
 //}
 if (condition == 'all') {
   //console.log('in all');
-  export_path = "/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/vids/mimic2/mimic_flipped_test_.webm";
+  export_path = "/Users/f0053cz/Documents/GitHub/chase_mimic_study/test_version/vids/mimic4/mimic_flipped_test_.webm"; //CHANGE HERE AS REQUIRED
 }
 
 let world = fromSaveStr(dataStr);
@@ -31,7 +31,7 @@ let exportOptions = {
   frameRate: 30,
   motionBlurFrames: 0,
   quality: 1,
-  numRecollapses: 0, // DON'T change this to 2 in the final version
+  numRecollapses: 2, // DON'T change this to 2 in the final version
   doExportState: true,
   doExportPsyn: true,
   doExportCheat: true
@@ -101,7 +101,7 @@ for (let var_i of subtletyVariations) { // 0,30,...150
         console.log('in loop', pos_ind)
         if (bad_inds_obj.black.find(element => element == pos_ind )) {
           export_vid = true;
-          console.log('bad vid ind:', pos_ind - 1)
+          console.log('bad vid ind:', pos_ind)
         } else {
           export_vid = false;
         }
